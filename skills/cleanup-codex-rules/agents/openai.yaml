@@ -1,0 +1,3 @@
+interface:
+  display_name: "Cleanup Codex Rules"
+  short_description: "Make Codex rules generic and compressed"
