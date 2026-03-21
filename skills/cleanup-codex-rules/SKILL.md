@@ -33,12 +33,39 @@ approval rules, especially `~/.codex/rules/default.rules`.
 ## Rules Of Thumb
 
 - Prefer broad safe prefixes over many exact one-off rules.
+- Codex approval rules are prefix matches on the actual argv. Preserve required
+  launcher/wrapper segments such as `["/bin/bash", "-lc", ...]`,
+  `["bash", "-lc", ...]`, `["sh", "-lc", ...]`, or similar wrappers when they
+  are part of the command shape that Codex really executes.
+- Do not "simplify" a rule by dropping a shell wrapper unless the replacement
+  prefix still matches the real command invocation. A shorter pattern that no
+  longer matches is not a cleanup; it causes repeated approval prompts.
 - Keep exact rules only when a broader prefix would be unsafe.
 - Treat destructive commands conservatively.
 - If the maintenance run adds self-maintenance approval entries, compress them
   away on the next candidate when they are not needed as standing rules.
 - Use `/tmp` for temporary candidate files instead of writing snapshots under
   `~/.codex/rules`.
+
+## Prefix Matching Guidance
+
+- Generalize from left to right and keep every argv segment that is required to
+  preserve a real prefix match.
+- When a command is executed through a shell wrapper, the safe compression point
+  is usually inside the shell payload string, not by removing the shell binary
+  and flags.
+- Example:
+  Keep `["/bin/bash", "-lc", "ANSIBLE_LOCAL_TEMP=/workspace/project/.ansible/tmp"]`
+  if Codex invokes the workflow through `bash -lc`.
+- Example:
+  Replacing
+  `["/bin/bash", "-lc", "mkdir -p .ansible/tmp && ANSIBLE_LOCAL_TEMP=/workspace/project/.ansible/tmp"]`
+  with
+  `["ANSIBLE_LOCAL_TEMP=/workspace/project/.ansible/tmp"]`
+  is incorrect, because the shorter rule no longer matches the actual prefix.
+- Before removing a longer rule, confirm that the proposed shorter rule matches
+  the same command family as executed, including wrappers added by Codex,
+  shells, env setters, or task runners.
 
 ## Verification
 

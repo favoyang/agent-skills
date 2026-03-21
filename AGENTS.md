@@ -37,13 +37,18 @@ lists. Keep YAML minimal and readable with two-space indentation. Name skill
 directories in lowercase kebab-case, for example `cleanup-codex-rules`. Keep
 file names conventional: `SKILL.md` for the skill definition and
 `agents/openai.yaml` for agent-specific metadata.
+Public skills must not include user-specific local filesystem paths. Generic
+locations such as `~/.codex` and `/tmp` are fine when they are part of the
+documented workflow. Replace personal machine paths with neutral examples such
+as `/workspace/project` or `<repo-root>`.
 
 ## Testing Guidelines
 
 No automated test suite is configured yet. Validate changes by checking
 Markdown rendering, frontmatter correctness, and referenced paths. For new
 skills, confirm that the GitHub-backed install path is correct and that any
-example commands are runnable as written.
+example commands are runnable as written. Check that public-facing examples do
+not expose personal local paths from the author machine.
 
 ## Commit & Pull Request Guidelines
 
